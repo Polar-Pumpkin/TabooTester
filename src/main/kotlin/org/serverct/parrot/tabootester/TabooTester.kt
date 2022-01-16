@@ -1,9 +1,9 @@
-package io.github.username.project
+package org.serverct.parrot.tabootester
 
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.info
 
-object ExamplePlugin : Plugin() {
+object TabooTester : Plugin() {
 
     override fun onEnable() {
         info("Successfully running ExamplePlugin!")

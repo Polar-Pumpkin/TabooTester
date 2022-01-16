@@ -1,14 +1,29 @@
 plugins {
     java
-    id("io.izzel.taboolib") version "1.16"
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
+    id("io.izzel.taboolib") version "1.34"
+    id("org.jetbrains.kotlin.jvm") version "1.5.30"
 }
 
 taboolib {
+    description {
+        contributors {
+            name("EntityParrot_")
+        }
+        dependencies {
+
+        }
+    }
+
     install("common")
+
+    install("module-lang")
+    install("module-chat")
+    install("module-configuration")
+
     install("platform-bukkit")
+
     classifier = null
-    version = "6.0.0-pre40"
+    version = "6.0.7-20"
 }
 
 repositories {
@@ -16,8 +31,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("ink.ptms.core:v11701:11701:mapped")
-    compileOnly("ink.ptms.core:v11701:11701:universal")
+    compileOnly("ink.ptms.core:v11200:11200")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
 }
