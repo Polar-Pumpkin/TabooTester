@@ -10,11 +10,13 @@ import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionType
 import org.serverct.parrot.tabootester.util.rangeSurface
+import org.serverct.parrot.tabootester.util.toEnum
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.subCommand
 import taboolib.platform.BukkitPlugin
 import taboolib.platform.util.sendInfoMessage
+import taboolib.platform.util.sendWarn
 import taboolib.platform.util.sendWarnMessage
 import kotlin.math.roundToInt
 
@@ -41,31 +43,38 @@ object TabooTesterCommand {
     @CommandBody
     val cloud = subCommand {
         dynamic {
-            execute<Player> { user, context, _ ->
-                val range = context.argument(0).toDoubleOrNull() ?: -1.0
-                if (range <= 0.0) {
-                    return@execute user.sendWarnMessage("半径需要一个正整数.")
+            dynamic {
+                suggestion<Player> { _, _ ->
+                    Particle.values().map { it.name }
                 }
+                execute<Player> { user, context, _ ->
+                    val range = context.argument(-1).toDoubleOrNull() ?: -1.0
+                    if (range <= 0.0) {
+                        return@execute user.sendWarnMessage("半径需要一个正整数.")
+                    }
+                    val particle = context.argument(0).toEnum<Particle>()
+                        ?: return@execute user.sendWarnMessage("请指定一个有效的粒子效果")
 
-                user.world.spawn(user.location, AreaEffectCloud::class.java) {
-                    it.setMetadata("Gas", FixedMetadataValue(BukkitPlugin.getInstance(), 3))
+                    user.world.spawn(user.location, AreaEffectCloud::class.java) {
+                        it.setMetadata("Gas", FixedMetadataValue(BukkitPlugin.getInstance(), 3))
 
-                    it.radius = range.toFloat()
-                    it.duration = 3 * 20
-                    it.reapplicationDelay = (0.5 * 20).roundToInt()
-                    it.waitTime = (0.5 * 20).roundToInt()
+                        it.radius = range.toFloat()
+                        it.duration = 3 * 20
+                        it.reapplicationDelay = (0.5 * 20).roundToInt()
+                        it.waitTime = (0.5 * 20).roundToInt()
 
-                    it.radiusOnUse = 0.0F
-                    it.radiusPerTick = 0.0F
-                    it.durationOnUse = 0
+                        it.radiusOnUse = 0.0F
+                        it.radiusPerTick = 0.0F
+                        it.durationOnUse = 0
 
-                    it.particle = Particle.SPELL
-                    it.color = Color.GREEN
-                    it.source = user
+                        it.particle = particle
+                        it.color = Color.LIME
+                        it.source = user
 
-                    it.basePotionData = PotionData(PotionType.WATER)
+                        it.basePotionData = PotionData(PotionType.WATER)
+                    }
+                    user.sendInfoMessage("Tagged AreaEffectCloud spawned.")
                 }
-                user.sendInfoMessage("Tagged AreaEffectCloud spawned.")
             }
         }
     }
