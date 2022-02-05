@@ -2,6 +2,7 @@ package org.serverct.parrot.tabootester.sample
 
 import taboolib.common.LifeCycle
 import taboolib.common.inject.Injector
+import taboolib.common.platform.Awake
 import java.util.function.Supplier
 
 interface Module {
@@ -12,6 +13,7 @@ interface Module {
         val modules: MutableList<Module> = ArrayList()
     }
 
+    @Awake
     object ModuleRegister : Injector.Classes {
 
         override val lifeCycle: LifeCycle = LifeCycle.ENABLE
