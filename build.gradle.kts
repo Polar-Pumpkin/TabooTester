@@ -31,9 +31,13 @@ repositories {
 }
 
 dependencies {
-    compileOnly("ink.ptms.core:v11200:11200")
+    compileOnly("ink.ptms.core:v11800:11800:api")
+    compileOnly("ink.ptms.core:v11800:11800:mapped")
+    compileOnly("ink.ptms.core:v11800:11800:universal")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
+
+    compileOnly("com.google.guava:guava:31.0.1-jre")
 }
 
 tasks.withType<JavaCompile> {

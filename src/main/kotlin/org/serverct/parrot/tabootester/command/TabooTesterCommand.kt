@@ -1,6 +1,5 @@
 package org.serverct.parrot.tabootester.command
 
-import org.apache.commons.lang.math.NumberUtils
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -27,7 +26,7 @@ object TabooTesterCommand {
     val range = subCommand {
         dynamic {
             execute<Player> { user, context, _ ->
-                val range = NumberUtils.toInt(context.argument(0), -1)
+                val range = context.argument(0).toIntOrNull() ?: -1
                 if (range <= 0) {
                     user.sendWarnMessage("半径需要一个正整数.")
                     return@execute
