@@ -6,7 +6,7 @@ import taboolib.common.platform.function.info
 
 object InventoryMoveItemListener {
 
-    @SubscribeEvent(ignoreCancelled = true)
+//    @SubscribeEvent(ignoreCancelled = true)
     fun onHopper(event: InventoryMoveItemEvent) {
         """
             InventoryMoveItemEvent {

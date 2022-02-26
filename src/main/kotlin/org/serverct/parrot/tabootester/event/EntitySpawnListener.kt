@@ -8,7 +8,7 @@ import taboolib.common.platform.function.info
 
 object EntitySpawnListener {
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onCreatureSpawn(event: CreatureSpawnEvent) {
         """
             CreatureSpawnEvent {
@@ -19,7 +19,7 @@ object EntitySpawnListener {
         """.trimIndent().split('\n').forEach { info(it) }
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onEntitySpawn(event: EntitySpawnEvent) {
         """
             EntitySpawnEvent {
@@ -29,7 +29,7 @@ object EntitySpawnListener {
         """.trimIndent().split('\n').forEach { info(it) }
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onHangingEntitySpawn(event: HangingPlaceEvent) {
         """
             HangingPlaceEvent {

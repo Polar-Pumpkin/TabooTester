@@ -8,7 +8,7 @@ import taboolib.common.platform.function.info
 
 object ItemDespawnListener {
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onItemDespawn(event: ItemDespawnEvent) {
         """
             ItemDespawnEvent {
@@ -19,7 +19,7 @@ object ItemDespawnListener {
         """.trimIndent().split('\n').forEach { info(it) }
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onItemEntityDamaged(event: EntityDamageEvent) {
         val item = event.entity as? Item ?: return
 

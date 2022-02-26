@@ -9,7 +9,7 @@ import taboolib.common.platform.function.info
 
 object EntityDeathListener {
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onDeath(event: EntityDeathEvent) {
         """
             EntityDeathEvent {

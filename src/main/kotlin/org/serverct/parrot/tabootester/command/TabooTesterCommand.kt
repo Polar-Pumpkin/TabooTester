@@ -1,29 +1,35 @@
 package org.serverct.parrot.tabootester.command
 
 import org.bukkit.Color
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.AreaEffectCloud
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionType
 import org.serverct.parrot.tabootester.util.rangeSurface
+import org.serverct.parrot.tabootester.util.squareBorder
 import org.serverct.parrot.tabootester.util.toEnum
 import taboolib.common.platform.command.CommandBody
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.function.submit
+import taboolib.common5.Coerce
 import taboolib.platform.BukkitPlugin
 import taboolib.platform.util.sendInfoMessage
-import taboolib.platform.util.sendWarn
 import taboolib.platform.util.sendWarnMessage
+import java.util.concurrent.CompletableFuture
 import kotlin.math.roundToInt
 
 @CommandHeader("tabootester", aliases = ["libtest", "tt"])
 object TabooTesterCommand {
 
     @CommandBody
-    val range = subCommand {
+    private val range = subCommand {
         dynamic {
             execute<Player> { user, context, _ ->
                 val range = context.argument(0).toIntOrNull() ?: -1
@@ -40,7 +46,7 @@ object TabooTesterCommand {
     }
 
     @CommandBody
-    val cloud = subCommand {
+    private val cloud = subCommand {
         dynamic {
             dynamic {
                 suggestion<Player> { _, _ ->
@@ -73,6 +79,55 @@ object TabooTesterCommand {
                         it.basePotionData = PotionData(PotionType.WATER)
                     }
                     user.sendInfoMessage("Tagged AreaEffectCloud spawned.")
+                }
+            }
+        }
+    }
+
+    @CommandBody
+    private val surface = subCommand {
+        dynamic {
+            restrict<Player> { _, _, argument -> Coerce.asInteger(argument).orElse(0) > 0 }
+            execute<Player> { user, context, _ ->
+                val heights = 0 until 255
+                fun isSurface(block: Block): Boolean = !block.isEmpty && block.getRelative(BlockFace.UP).isEmpty
+                fun closer(block: Block): Block = block.getRelative(if (block.isEmpty) BlockFace.DOWN else BlockFace.UP)
+                fun isStandable(location: Location): Boolean = with(location.block) {
+                    type.isSolid && getRelative(BlockFace.UP).isEmpty && getRelative(BlockFace.UP, 2).isEmpty
+                }
+
+                val timestamp = System.currentTimeMillis()
+                val range = context.argument(0).toInt()
+                val center = user.location
+                submit(async = true) {
+                    for (radius in 0..range) {
+                        center.squareBorder(radius).forEach { value ->
+                            val future = CompletableFuture<Location>()
+
+                            if (value.world == null || value.blockY < 0) {
+                                future.completeExceptionally(IllegalArgumentException("Invalid location: $value"))
+                            } else {
+                                submit(async = true) {
+                                    var block = value.block
+                                    while (block.y in heights && !isSurface(block)) {
+                                        block = closer(block)
+                                    }
+                                    future.complete(block.location)
+                                }
+                            }
+
+                            future.whenComplete { at, exception ->
+                                exception?.printStackTrace()
+                                at ?: return@whenComplete
+                                if (isStandable(at)) {
+                                    at.block.let {
+                                        submit { it.type = Material.GLASS }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    user.sendInfoMessage("Time elapse: {0}ms", System.currentTimeMillis() - timestamp)
                 }
             }
         }

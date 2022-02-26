@@ -5,6 +5,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import java.util.*
 import kotlin.math.roundToInt
 
 inline fun <reified T : Enum<T>> String?.toEnum(): T? {
@@ -69,4 +70,25 @@ fun Location.rangeSurface(range: Int): List<Location> {
     return surface.collectAround(this, range, ArrayList<Location>().apply {
         add(surface.getRelative(BlockFace.UP).location)
     })
+}
+
+fun Location.squareBorder(radius: Int): List<Location> {
+    val queue = LinkedList<Location>()
+
+    val y = blockY.toDouble()
+    val west = blockX - radius
+    val east = blockX + radius
+    val north = blockZ - radius
+    val south = blockZ + radius
+
+    for (z in north..south) {
+        queue.offer(Location(world, west.toDouble(), y, z.toDouble()))
+        queue.offer(Location(world, east.toDouble(), y, z.toDouble()))
+    }
+
+    for (x in (west + 1) until east) {
+        queue.offer(Location(world, x.toDouble(), y, north.toDouble()))
+        queue.offer(Location(world, x.toDouble(), y, south.toDouble()))
+    }
+    return queue
 }

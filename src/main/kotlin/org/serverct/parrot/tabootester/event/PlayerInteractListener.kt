@@ -8,7 +8,7 @@ import taboolib.common.platform.function.info
 
 object PlayerInteractListener {
 
-    @SubscribeEvent(ignoreCancelled = true)
+//    @SubscribeEvent(ignoreCancelled = true)
     fun onInteract(event: PlayerInteractEvent) {
         if (event.hand != EquipmentSlot.HAND) {
             return
@@ -21,7 +21,7 @@ object PlayerInteractListener {
         """.trimIndent().split('\n').forEach { info(it) }
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     fun onInteractWithFlowerPot(event: PlayerInteractEvent) {
         val block = event.clickedBlock ?: return
         if (block.type != Material.FLOWER_POT) {
