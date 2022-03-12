@@ -6,11 +6,13 @@ import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.AreaEffectCloud
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionType
+import org.serverct.parrot.tabootester.config.CustomConfig
 import org.serverct.parrot.tabootester.util.rangeSurface
 import org.serverct.parrot.tabootester.util.squareBorder
 import org.serverct.parrot.tabootester.util.toEnum
@@ -27,6 +29,14 @@ import kotlin.math.roundToInt
 
 @CommandHeader("tabootester", aliases = ["libtest", "tt"])
 object TabooTesterCommand {
+
+    @CommandBody
+    private val reload = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            CustomConfig.config.reload()
+            sender.sendInfoMessage("插件重载完成")
+        }
+    }
 
     @CommandBody
     private val range = subCommand {
