@@ -1,5 +1,8 @@
 package org.serverct.parrot.tabootester.command
 
+import ink.ptms.adyeshach.api.AdyeshachAPI
+import ink.ptms.adyeshach.common.entity.EntityTypes
+import ink.ptms.adyeshach.common.entity.type.AdySlime
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material
@@ -13,6 +16,7 @@ import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionType
 import org.serverct.parrot.tabootester.config.CustomConfig
+import org.serverct.parrot.tabootester.event.HologramListener
 import org.serverct.parrot.tabootester.util.rangeSurface
 import org.serverct.parrot.tabootester.util.squareBorder
 import org.serverct.parrot.tabootester.util.toEnum
@@ -21,6 +25,7 @@ import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.submit
 import taboolib.common5.Coerce
+import taboolib.common5.Demand
 import taboolib.platform.BukkitPlugin
 import taboolib.platform.util.sendInfoMessage
 import taboolib.platform.util.sendWarnMessage
@@ -139,6 +144,37 @@ object TabooTesterCommand {
                     }
                     user.sendInfoMessage("Time elapse: {0}ms", System.currentTimeMillis() - timestamp)
                 }
+            }
+        }
+    }
+
+    @CommandBody
+    private val hologram = subCommand {
+        dynamic {
+            execute<Player> { user, _, argument ->
+                if (!HologramListener.isHologramEnabled) {
+                    return@execute
+                }
+                val location = user.location
+                val hologram = AdyeshachAPI.createHologram(user, location, argument.split(' '))
+                val slime = AdyeshachAPI.getEntityManagerPrivateTemporary(user)
+                    .create(EntityTypes.SLIME, location.clone().add(0.5, 0.0, 0.0)) {
+                        val npc = it as AdySlime
+                        npc.setSize(1)
+                        npc.setTag("Clickable", "click")
+                    } as AdySlime
+                HologramListener.holograms += Triple(location, hologram, slime)
+                user.sendMessage("Created.")
+            }
+        }
+    }
+
+    @CommandBody
+    private val demand = subCommand {
+        dynamic("内容") {
+            execute<CommandSender> { sender, _, argument ->
+                val demand = Demand(argument)
+                sender.sendMessage(demand.toString())
             }
         }
     }

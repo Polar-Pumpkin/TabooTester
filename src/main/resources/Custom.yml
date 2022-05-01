@@ -6,6 +6,6 @@
   Name: §8§l>§7§l>§f§l>§f§l【烈焰人的头】§f§l<§7§l<§8§l<§l
   onFailure:
     - 'title color "&6失败" subtitle color "&c兑换所需材料不足" by 15 50 15'
-  onMatched: |
+  onMatched: |-
     title color "&e&l炙焰幻化" subtitle color "&a恭喜您获得新称号" by 15 50 15
     command "ch give @sender &e&l[炙焰幻化] 0" as op
