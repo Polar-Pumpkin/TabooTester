@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.AreaEffectCloud
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionData
 import org.bukkit.potion.PotionType
@@ -27,6 +28,7 @@ import taboolib.common.platform.function.submit
 import taboolib.common5.Coerce
 import taboolib.common5.Demand
 import taboolib.platform.BukkitPlugin
+import taboolib.platform.util.isAir
 import taboolib.platform.util.sendInfoMessage
 import taboolib.platform.util.sendWarnMessage
 import java.util.concurrent.CompletableFuture
@@ -176,6 +178,22 @@ object TabooTesterCommand {
                 val demand = Demand(argument)
                 sender.sendMessage(demand.toString())
             }
+        }
+    }
+
+    @CommandBody
+    private val backpack = subCommand {
+        fun Array<ItemStack?>.print(viewer: Player, name: String) {
+            val space = count { it.isAir() }
+            viewer.sendMessage("${name}(${space}/${size}): ${contentToString()}")
+        }
+
+        execute<Player> { user, _, _ ->
+            val inv = user.inventory
+            inv.contents.print(user, "Contents")
+            inv.armorContents.print(user, " ArmorContents")
+            inv.extraContents.print(user, "ExtraContents")
+            inv.storageContents.print(user, "StorageContents")
         }
     }
 
