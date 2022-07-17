@@ -23,6 +23,7 @@ import org.serverct.parrot.tabootester.util.rangeSurface
 import org.serverct.parrot.tabootester.util.squareBorder
 import org.serverct.parrot.tabootester.util.toEnum
 import taboolib.common.platform.command.CommandBody
+import taboolib.common.platform.command.CommandContext
 import taboolib.common.platform.command.CommandHeader
 import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.submit
@@ -76,7 +77,7 @@ object TabooTesterCommand {
                     if (range <= 0.0) {
                         return@execute user.sendWarnMessage("半径需要一个正整数.")
                     }
-                    val particle = context.argument(0).toEnum<Particle>()
+                    val particle = context.argument(0).toEnum<org.bukkit.Particle>()
                         ?: return@execute user.sendWarnMessage("请指定一个有效的粒子效果")
 
                     user.world.spawn(user.location, AreaEffectCloud::class.java) {
@@ -201,25 +202,45 @@ object TabooTesterCommand {
 
     @CommandBody
     private val dust = subCommand {
-        dynamic("R") {
-            restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
-            dynamic("G") {
-                restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
-                dynamic("B") {
-                    restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
-                    dynamic("Size") {
-                        restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
-                        execute<Player> { user, context, _ ->
-                            val r = Coerce.toInteger(context.argument(-3))
-                            val g = Coerce.toInteger(context.argument(-2))
-                            val b = Coerce.toInteger(context.argument(-1))
-                            val size = Coerce.toFloat(context.argument(0))
+        fun handle(user: Player, context: CommandContext<Player>) {
+            val count = Coerce.toInteger(context.argument(-7))
+            val offsetX = Coerce.toDouble(context.argument(-6))
+            val offsetY = Coerce.toDouble(context.argument(-5))
+            val offsetZ = Coerce.toDouble(context.argument(-4))
+            val r = Coerce.toInteger(context.argument(-3))
+            val g = Coerce.toInteger(context.argument(-2))
+            val b = Coerce.toInteger(context.argument(-1))
+            val size = Coerce.toFloat(context.argument(0))
 
-                            if (MinecraftVersion.major > 4) {
-                                val option = DustOptions(Color.fromRGB(r, g, b), size)
-                                user.spawnParticle(Particle.REDSTONE, user.location, 20, 1.7, 1.7, 1.7, option)
-                            } else {
-                                user.spawnParticle(Particle.REDSTONE, user.location, 20, r / 255.0, g / 255.0, b / 255.0, size.toDouble())
+            if (MinecraftVersion.major > 4) {
+                val option = DustOptions(Color.fromRGB(r, g, b), size)
+                user.spawnParticle(Particle.REDSTONE, user.location, count, offsetX, offsetY, offsetZ, option)
+            } else {
+                user.spawnParticle(Particle.REDSTONE, user.location.add(offsetX, offsetY, offsetZ), count, r / 255.0, g / 255.0, b / 255.0, size.toDouble())
+            }
+        }
+
+        dynamic("count") {
+            restrict<Player> { _, _, argument -> Coerce.asInteger(argument).map { it >= 0 }.orElse(false) }
+            dynamic("offsetX") {
+                restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                dynamic("offsetY") {
+                    restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                    dynamic("offsetZ") {
+                        restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                        dynamic("R") {
+                            restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                            dynamic("G") {
+                                restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                                dynamic("B") {
+                                    restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                                    dynamic("Size") {
+                                        restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                                        execute<Player> { user, context, _ ->
+                                            handle(user, context)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
