@@ -7,6 +7,7 @@ import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.Particle.DustOptions
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.command.CommandSender
@@ -27,6 +28,7 @@ import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.submit
 import taboolib.common5.Coerce
 import taboolib.common5.Demand
+import taboolib.module.nms.MinecraftVersion
 import taboolib.platform.BukkitPlugin
 import taboolib.platform.util.isAir
 import taboolib.platform.util.sendInfoMessage
@@ -194,6 +196,38 @@ object TabooTesterCommand {
             inv.armorContents.print(user, " ArmorContents")
             inv.extraContents.print(user, "ExtraContents")
             inv.storageContents.print(user, "StorageContents")
+        }
+    }
+
+    @CommandBody
+    private val dust = subCommand {
+        dynamic("R") {
+            restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+            dynamic("G") {
+                restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                dynamic("B") {
+                    restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                    dynamic("Size") {
+                        restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
+                        execute<Player> { user, context, _ ->
+                            if (MinecraftVersion.major > 4) {
+                                val r = Coerce.toInteger(context.argument(-3))
+                                val g = Coerce.toInteger(context.argument(-2))
+                                val b = Coerce.toInteger(context.argument(-1))
+                                val size = Coerce.toFloat(context.argument(0))
+                                val option = DustOptions(Color.fromRGB(r, g, b), size)
+                                user.spawnParticle(Particle.REDSTONE, user.location, 20, 1.7, 1.7, 1.7, option)
+                            } else {
+                                val r = Coerce.toDouble(context.argument(-3))
+                                val g = Coerce.toDouble(context.argument(-2))
+                                val b = Coerce.toDouble(context.argument(-1))
+                                val size = Coerce.toDouble(context.argument(0))
+                                user.spawnParticle(Particle.REDSTONE, user.location, 20, r, g, b, size)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
