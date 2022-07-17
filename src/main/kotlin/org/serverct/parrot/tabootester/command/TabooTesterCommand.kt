@@ -210,19 +210,16 @@ object TabooTesterCommand {
                     dynamic("Size") {
                         restrict<Player> { _, _, argument -> Coerce.asDouble(argument).map { it >= 0.0 }.orElse(false) }
                         execute<Player> { user, context, _ ->
+                            val r = Coerce.toInteger(context.argument(-3))
+                            val g = Coerce.toInteger(context.argument(-2))
+                            val b = Coerce.toInteger(context.argument(-1))
+                            val size = Coerce.toFloat(context.argument(0))
+
                             if (MinecraftVersion.major > 4) {
-                                val r = Coerce.toInteger(context.argument(-3))
-                                val g = Coerce.toInteger(context.argument(-2))
-                                val b = Coerce.toInteger(context.argument(-1))
-                                val size = Coerce.toFloat(context.argument(0))
                                 val option = DustOptions(Color.fromRGB(r, g, b), size)
                                 user.spawnParticle(Particle.REDSTONE, user.location, 20, 1.7, 1.7, 1.7, option)
                             } else {
-                                val r = Coerce.toDouble(context.argument(-3))
-                                val g = Coerce.toDouble(context.argument(-2))
-                                val b = Coerce.toDouble(context.argument(-1))
-                                val size = Coerce.toDouble(context.argument(0))
-                                user.spawnParticle(Particle.REDSTONE, user.location, 20, r, g, b, size)
+                                user.spawnParticle(Particle.REDSTONE, user.location, 20, r / 255.0, g / 255.0, b / 255.0, size.toDouble())
                             }
                         }
                     }
